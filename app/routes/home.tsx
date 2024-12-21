@@ -6,12 +6,12 @@ import { Footer } from '~/components/Footer';
 
 export function meta({}: Route.MetaArgs) {
   return [
-    { title: 'New React Router App' },
-    { name: 'description', content: 'Welcome to React Router!' },
+    { title: 'Book Tracker App' },
+    { name: 'description', content: 'Book Tracker Application' },
   ];
 }
 
-export default function Home({ actionData }: Route.ComponentProps) {
+export default function Home() {
   return (
     <Fragment>
       <Header />

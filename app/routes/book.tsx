@@ -5,18 +5,23 @@ import type { Route } from './+types/book';
 import { Button } from '~/components/Button';
 import { storage, type Book } from '~/model';
 
+export function meta({ data }: Route.MetaArgs) {
+  return [{ title: `Edit "${data.title}"` }];
+}
+
 export async function action({ params, request }: Route.ActionArgs) {
   let formData = await request.formData();
   let { bookId } = params;
-  let newRating = formData.get('rating');
+  let newRating = (Number(formData.get('rating')) ||
+    undefined) as Book['rating'];
   let isFinished = Boolean(formData.get('isFinished'));
 
   if (request.method === 'DELETE') {
     storage.books = storage.books.filter(({ id }) => +bookId !== id);
-  } else if (newRating || isFinished !== storage.books[+bookId].isFinished) {
+  } else {
     Object.assign(storage.books[+bookId], {
-      isFinished: isFinished,
-      rating: Number(newRating) as Book['rating'],
+      isFinished,
+      rating: newRating,
     });
   }
 
@@ -36,9 +41,9 @@ export default function Book({ loaderData }: Route.ComponentProps) {
   const [isFinished, setIsFinished] = useState<boolean>(
     loaderData?.isFinished || false
   );
-  const [rating, setRating] = useState<number>(Number(loaderData?.rating) || 0);
-  const fetcher = useFetcher();
+  const [rating, setRating] = useState<number>(Number(loaderData?.rating));
 
+  const fetcher = useFetcher();
   function deleteBook(bookId: number | undefined = loaderData?.id) {
     const confirmation = confirm('Are you sure you want to delete this book?');
     confirmation &&

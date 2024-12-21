@@ -1,5 +1,13 @@
 import { Fragment } from 'react/jsx-runtime';
 import { Link } from 'react-router';
+import type { Route } from './+types/about';
+
+export function meta({}: Route.MetaArgs) {
+  return [
+    { title: 'About Book Tracker App' },
+    { name: 'description', content: 'About this Application' },
+  ];
+}
 
 export default function About() {
   return (
