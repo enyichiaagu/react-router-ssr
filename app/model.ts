@@ -19,7 +19,7 @@ export const storage: Data = {
       author: 'Vaclav Smil',
       isbn: `978-0241454411`,
       isFinished: true,
-      rating: 4,
+      rating: 1,
     },
   ],
 };

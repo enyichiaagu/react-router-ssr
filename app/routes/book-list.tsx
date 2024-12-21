@@ -19,7 +19,6 @@ export async function action({ request }: Route.ActionArgs) {
     });
   }
 
-  console.log('action loaded!');
   return storage;
 }
 

@@ -1,4 +1,5 @@
 import { Link } from 'react-router';
+import { IoCheckmarkCircle } from 'react-icons/io5';
 import type { Book } from '~/model';
 
 export function BookCard({
@@ -30,7 +31,11 @@ export function BookCard({
         <span>{author}</span>
         <div className='flex justify-between'>
           <span>Rating: {rating ? `${rating}/5` : 'None'}</span>
-          <span>{isFinished && 'Finished'}</span>
+          {isFinished && (
+            <span className='flex items-center gap-1'>
+              Finished <IoCheckmarkCircle className='text-green-600' />
+            </span>
+          )}
         </div>
       </div>
     </Link>

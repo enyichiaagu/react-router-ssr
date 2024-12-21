@@ -1,9 +1,27 @@
-import { useState } from 'react';
-import { Link } from 'react-router';
-import { IoArrowBackCircle, IoStarOutline } from 'react-icons/io5';
+import { useState, type ChangeEvent } from 'react';
+import { Link, Form, redirect, useFetcher } from 'react-router';
+import { IoArrowBackCircle, IoStarOutline, IoStar } from 'react-icons/io5';
 import type { Route } from './+types/book';
 import { Button } from '~/components/Button';
 import { storage, type Book } from '~/model';
+
+export async function action({ params, request }: Route.ActionArgs) {
+  let formData = await request.formData();
+  let { bookId } = params;
+  let newRating = formData.get('rating');
+  let isFinished = Boolean(formData.get('isFinished'));
+
+  if (request.method === 'DELETE') {
+    storage.books = storage.books.filter(({ id }) => +bookId !== id);
+  } else if (newRating || isFinished !== storage.books[+bookId].isFinished) {
+    Object.assign(storage.books[+bookId], {
+      isFinished: isFinished,
+      rating: Number(newRating) as Book['rating'],
+    });
+  }
+
+  return redirect('/');
+}
 
 export async function loader({ params }: Route.LoaderArgs) {
   const { bookId } = params;
@@ -13,6 +31,23 @@ export async function loader({ params }: Route.LoaderArgs) {
 }
 
 export default function Book({ loaderData }: Route.ComponentProps) {
+  const [isFinished, setIsFinished] = useState<boolean>(
+    loaderData?.isFinished || false
+  );
+  const [rating, setRating] = useState<number>(Number(loaderData?.rating) || 0);
+  const fetcher = useFetcher();
+
+  function deleteBook(bookId: number | undefined = loaderData?.id) {
+    const confirmation = confirm('Are you sure you want to delete this book?');
+    confirmation &&
+      fetcher.submit(
+        { id: bookId as number },
+        {
+          method: 'delete',
+        }
+      );
+  }
+
   return (
     <div className='w-full mx-5'>
       <Link to='/' className='text-purple-700 flex items-center gap-1 w-fit'>
@@ -33,24 +68,57 @@ export default function Book({ loaderData }: Route.ComponentProps) {
         <div className='flex flex-col ml-5 grow'>
           <span className='font-medium text-xl'>{loaderData?.title}</span>
           <span>{loaderData?.author}</span>
-          <span className='my-5'>
-            <input type='checkbox' name='isFinished' id='finished' />
-            <label htmlFor='finished'>Finished</label>
-          </span>
-          <div className='mb-5'>
-            <span>Your Rating:</span>
-            <span className='text-3xl flex'>
-              <IoStarOutline />
-              <IoStarOutline />
-              <IoStarOutline />
-              <IoStarOutline />
-              <IoStarOutline />
+          <Form method='post'>
+            <span className='my-5 block'>
+              <input
+                type='checkbox'
+                name='isFinished'
+                id='finished'
+                checked={isFinished}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  setIsFinished(e.target.checked)
+                }
+              />
+              <label htmlFor='finished' className='ml-2'>
+                Finished
+              </label>
             </span>
-          </div>
-          <div className='text-right'>
-            <Button>Save</Button>
-            <Button variant='delete'>Delete Book</Button>
-          </div>
+            <div className='mb-5'>
+              <span>Your Rating:</span>
+              <span className='text-3xl flex'>
+                {[1, 2, 3, 4, 5].map((num) => {
+                  return (
+                    <span key={num} className='flex'>
+                      <input
+                        className='hidden'
+                        type='radio'
+                        name='rating'
+                        id={`rating-${num}`}
+                        value={num}
+                        checked={rating === num}
+                        onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                          setRating(+e.target.value)
+                        }
+                      />
+                      <label htmlFor={`rating-${num}`}>
+                        {num <= rating ? <IoStar /> : <IoStarOutline />}
+                      </label>
+                    </span>
+                  );
+                })}
+              </span>
+            </div>
+            <div className='text-right'>
+              <Button type='submit'>Save</Button>
+              <Button
+                variant='delete'
+                type='button'
+                onClick={() => deleteBook()}
+              >
+                Delete Book
+              </Button>
+            </div>
+          </Form>
         </div>
       </div>
     </div>
