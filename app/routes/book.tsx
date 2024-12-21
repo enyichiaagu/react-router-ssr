@@ -1,5 +1,5 @@
 import { useState, type ChangeEvent } from 'react';
-import { Link, Form, redirect, useFetcher } from 'react-router';
+import { Link, Form, redirect, useFetcher, data } from 'react-router';
 import { IoArrowBackCircle, IoStarOutline, IoStar } from 'react-icons/io5';
 import type { Route } from './+types/book';
 import { Button } from '~/components/Button';
@@ -26,6 +26,8 @@ export async function action({ params, request }: Route.ActionArgs) {
 export async function loader({ params }: Route.LoaderArgs) {
   const { bookId } = params;
   const book: Book | undefined = storage.books.find(({ id }) => +bookId === id);
+
+  if (!book) throw data(null, { status: 404 });
 
   return book;
 }

@@ -1,3 +1,4 @@
+import { data } from 'react-router';
 import type { Route } from './+types/book-list';
 import { BookCard } from '~/components/BookCard';
 import { storage } from '~/model';
@@ -19,7 +20,7 @@ export async function action({ request }: Route.ActionArgs) {
     });
   }
 
-  return storage;
+  return data(storage, { status: 201 });
 }
 
 export async function loader({}: Route.LoaderArgs) {
