@@ -1,4 +1,4 @@
-export interface Book {
+interface Book {
   id: number;
   title: string;
   author: string;
@@ -11,7 +11,7 @@ interface Data {
   books: Book[];
 }
 
-export const storage: Data = {
+const storage: Data = {
   books: [
     {
       id: 0,
@@ -23,3 +23,5 @@ export const storage: Data = {
     },
   ],
 };
+
+export { type Book, storage };

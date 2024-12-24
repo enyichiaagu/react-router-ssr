@@ -1,5 +1,5 @@
 import { useState, type ChangeEvent } from 'react';
-import { Link, Form, redirect, useFetcher, data } from 'react-router';
+import { Link, Form, redirect, useSubmit, data } from 'react-router';
 import { IoArrowBackCircle, IoStarOutline, IoStar } from 'react-icons/io5';
 import type { Route } from './+types/book';
 import { Button } from '~/components/Button';
@@ -18,7 +18,7 @@ export async function action({ params, request }: Route.ActionArgs) {
 
   if (request.method === 'DELETE') {
     storage.books = storage.books.filter(({ id }) => +bookId !== id);
-  } else {
+  } else if (newRating) {
     Object.assign(storage.books[+bookId], {
       isFinished,
       rating: newRating,
@@ -43,12 +43,13 @@ export default function Book({ loaderData }: Route.ComponentProps) {
   );
   const [rating, setRating] = useState<number>(Number(loaderData?.rating));
 
-  const fetcher = useFetcher();
+  const submit = useSubmit();
+
   function deleteBook(bookId: number | undefined = loaderData?.id) {
     const confirmation = confirm('Are you sure you want to delete this book?');
     confirmation &&
-      fetcher.submit(
-        { id: bookId as number },
+      submit(
+        { id: bookId },
         {
           method: 'delete',
         }
@@ -56,7 +57,7 @@ export default function Book({ loaderData }: Route.ComponentProps) {
   }
 
   return (
-    <div className='w-full mx-5'>
+    <div className='mx-5'>
       <Link to='/' className='text-purple-700 flex items-center gap-1 w-fit'>
         <IoArrowBackCircle /> Back to home
       </Link>

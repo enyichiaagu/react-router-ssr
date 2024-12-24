@@ -8,14 +8,14 @@ export async function action({ request }: Route.ActionArgs) {
 
   let title = formData.get('title') as string | null;
   let author = formData.get('author') as string | null;
-  let isbn = formData.get('isbn') as string | undefined;
+  let isbn = formData.get('isbn') as string;
 
   if (title && author) {
     storage.books.push({
       id: storage.books.length,
       title,
       author,
-      isbn,
+      isbn: isbn || undefined,
       isFinished: false,
     });
   }
